@@ -18,7 +18,7 @@ The process requires 2 environment variables to be set, which are in the systemd
 Enabling and starting the service using systemd
 ```
 systemctl enable shutdown_monitor.service
-systemctl start shutdown_monitor.service
+systemctl start shutdown_monitor.serviceg
 ```
 
 To disable the service from starting at boot
@@ -36,3 +36,19 @@ hardware. There are several functions that can be accessed.
   toggle the write access of the onboard eeprom
 
 * adc channels - to be implemented
+
+License
+-------
+
+Licensed under either of
+
+ * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
+additional terms or conditions.
