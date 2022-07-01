@@ -1,0 +1,13 @@
+[Unit]
+Description=Shutdown Monitor
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=shutdown_monitor
+Restart=no
+Environment="OPENCPN_PKILL_DELAY=2"
+Environment="OPENCPN_USER=pi"
+
+[Install]
+WantedBy=multi-user.target

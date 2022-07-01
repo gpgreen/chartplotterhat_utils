@@ -1,0 +1,27 @@
+[package]
+name = "chartplotterhat_utils"
+version = "0.1.0"
+edition = "2021"
+authors = ["Greg Green <ggreen@bit-builder.com>"]
+
+[dependencies]
+embedded-hal = {version = "^0.2.7", features = ["unproven"]}
+linux-embedded-hal = "0.3.2"
+clap = {version = "3.2.7", features = ["derive"]}
+
+[[bin]]
+name = "spitool"
+path = "src/spitool/main.rs"
+test = false
+bench = false
+
+[[bin]]
+name = "shutdown_monitor"
+path = "src/shutdown_monitor/main.rs"
+test = false
+bench = false
+
+[profile.release]
+codegen-units = 1 # better optimizations
+debug = true # symbols are nice and they don't increase the size on Flash
+lto = true # better optimizations
