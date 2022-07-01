@@ -1,0 +1,110 @@
+########################################################################
+# EEPROM settings text file
+#
+# Chart Plotter Hat V0.4
+#
+# This hardware provides power to the PI, and has an atmega328p device
+# to monitor a button switch and turn power off/on. It uses 2 GPIO's
+# to communicate with the Pi. One pin is pulled low by the hat if the Pi is to
+# shutdown. The other pin is pulled high by the Pi to indicate it is running,
+# once the Pi has shutdown, the pin will go low, and the hat knows it can
+# shutdown the power.
+#
+# This hardware contains a MCP2515 CAN Controller, QWIC connectors for I2C
+# A Serial GPS module can be connected to the Pi's Serial0. The atmega328p
+# acts as an secondary SPI so that ADC values can be read by the Pi, and
+# allow the EEPROM write protect can be raised or lowered
+########################################################################
+
+########################################################################
+# Vendor info
+
+# 128 bit UUID. If left at zero eepmake tool will auto-generate
+# RFC 4122 compliant UUID
+product_uuid f325ec9b-256a-49ef-800b-06e10b83ccf4
+
+# 16 bit product id
+product_id 0x0001
+
+# 16 bit product version
+product_ver 0x0004
+
+# ASCII vendor string  (max 255 characters)
+vendor "bit-builder.com"
+
+# ASCII product string (max 255 characters)
+product "Chart Plotter Hat"
+
+# Custom binary data
+custom_data
+Hello to those that traverse the deep
+end
+
+########################################################################
+# GPIO bank settings, set to nonzero to change from the default.
+# NOTE these setting can only be set per BANK, uncommenting any of
+# these will force the bank to use the custom setting.
+
+# drive strength, 0=default, 1-8=2,4,6,8,10,12,14,16mA, 9-15=reserved
+gpio_drive 0
+
+# 0=default, 1=slew rate limiting, 2=no slew limiting, 3=reserved
+gpio_slew 0
+
+# 0=default, 1=hysteresis disabled, 2=hysteresis enabled, 3=reserved
+gpio_hysteresis 0
+
+# If board back-powers Pi via 5V GPIO header pins:
+# 0 = board does not back-power
+# 1 = board back-powers and can supply the Pi with a minimum of 1.3A
+# 2 = board back-powers and can supply the Pi with a minimum of 2A
+# 3 = reserved
+# If back_power=2 then USB high current mode will be automatically
+# enabled on the Pi
+back_power 1
+
+########################################################################
+# GPIO pins, uncomment for GPIOs used on board
+# Options for FUNCTION: INPUT, OUTPUT, ALT0-ALT5
+# Options for PULL: DEFAULT, UP, DOWN, NONE
+# NB GPIO0 and GPIO1 are reserved for ID EEPROM so cannot be set
+
+#         GPIO  FUNCTION  PULL
+#         ----  --------  ----
+# serial0 RX
+#setgpio  14    INPUT     DEFAULT
+# serial0 TX
+#setgpio  15    INPUT     DEFAULT
+
+# I2C-1 SDA
+setgpio  2     ALT0     DEFAULT
+# I2C-1 SCL
+setgpio  3     ALT0     DEFAULT
+# EOC
+setgpio  4     INPUT     DEFAULT
+# AVR_CS, SPI0_CE0_N, ALT0
+setgpio  8     OUTPUT     UP
+# SPI0 MISO, ALT0
+setgpio  9     ALT0     DEFAULT
+# SPI0 MOSI, ALT0
+setgpio  10    ALT0     DEFAULT
+# SPI0 SCK, ALT0
+setgpio  11    ALT0     DEFAULT
+# CAN_RST
+setgpio  16    OUTPUT     UP
+# CAN_CS, SPI1_CEO_N, ALT4
+setgpio  18    ALT4     DEFAULT
+# SPI1 SO, ALT4
+setgpio  19    ALT4     DEFAULT
+# SPI1 SI, ALT4
+setgpio  20    ALT4     DEFAULT
+# SPI1 SCK, ALT4
+setgpio  21    ALT4     DEFAULT
+# SHUTDOWN
+setgpio  22    INPUT     DEFAULT
+# MCU_RUNNING
+setgpio  23    OUTPUT     NONE
+# XCLR
+setgpio  24    INPUT     DEFAULT
+# CAN_INT
+setgpio  26    INPUT     UP

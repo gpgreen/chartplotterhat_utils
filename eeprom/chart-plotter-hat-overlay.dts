@@ -1,0 +1,128 @@
+/dts-v1/;
+/plugin/;
+
+
+/ {
+	compatible = "brcm,bcm2835", "brcm,bcm2708", "brcm,bcm2709";
+
+        /* the pins of spi0 */
+        fragment@0 {
+            target = <&gpio>;
+            __overlay__ {
+                spi0_pins: spi0_pins {
+                    brcm,pins = <9 10 11>;
+                    brcm,function = <0x4>; /* alternate function 0 */
+                };
+                spi0_cs_pins: spi0_cs_pins {
+                    brcm,pins = <7>;
+                    brcm,function = <0x4>; /* alternate function 0 */
+                };
+            };
+        };
+
+        /* spi 0 using only pin 7 as csN, we need pin 8 as general gpio */
+        fragment@1 {
+            target = <&spi0>;
+            __overlay__ {
+                /* needed to avoid dtc warning */
+                #address-cells = <1>;
+                #size-cells = <0>;
+                status = "okay";
+                pinctrl-names = "default";
+                pinctrl-0 = <&spi0_pins &spi0_cs_pins>;
+                cs-gpios = <&gpio 7 1>;
+            };
+        };
+
+        /* disable spidev1 */
+        fragment@2 {
+            target = <&spidev1>;
+            __overlay__ {
+                status = "disabled";
+            };
+        };
+
+        /* the pins of spi1 */
+        fragment@3 {
+            target = <&gpio>;
+            __overlay__ {
+                spi1_pins: spi1_pins {
+                    brcm,pins = <19 20 21>;
+                    brcm,function = <0x3>; /* alternate function 4 */
+                };
+                spi1_cs_pins: spi1_cs_pins {
+                    brcm,pins = <17 18>;
+                    brcm,function = <0x3>; /* alternate function 4 */
+                };
+            };
+        };
+
+        /* spi1 config */
+        fragment@4 {
+            target = <&spi1>;
+            __overlay__ {
+                /* needed to avoid dtc warning */
+                #address-cells = <1>;
+                #size-cells = <0>;
+                status = "okay";
+                pinctrl-names = "default";
+                pinctrl-0 = <&spi1_pins &spi1_cs_pins>;
+                cs-gpios = <&gpio 18 1>;
+            };
+        };
+
+        /* the interrupt pin of the can-controller */
+        fragment@5 {
+            target = <&gpio>;
+            __overlay__ {
+                can0_int_pins: can0_int_pins {
+                    brcm,pins = <26>; /* gpio26, hardware pin 37 */
+                    brcm,function = <0>; /* input */
+                };
+                can0_rst_pins: can0_rst_pins {
+                    brcm,pins = <16>; /* gpio 16, hardware pin 36 */
+                    brcm,pull = <1>; /* pull up */
+                    brcm,function = <1>; /* output */
+                    output-high;
+                };
+            };
+        };
+
+        /* the clock/oscillator of the can-controller */
+        fragment@6 {
+            target-path = "/clocks";
+                __overlay__ {
+                    /* external oscillator of mcp2515 on spi1.0 */
+                    can0_osc: can0_osc {
+                        compatible = "fixed-clock";
+                        #clock-cells = <0>;
+                        clock-frequency  = <16000000>;
+                    };
+                };
+        };
+
+        /* the spi config of the can-controller */
+	fragment@7 {
+		target = <&spi1>;
+		__overlay__ {
+		    /* needed to avoid dtc warning */
+		    #address-cells = <1>;
+		    #size-cells = <0>;
+		    can0: mcp251x@0 {
+		        compatible = "microchip,mcp2515";
+			reg = <0>;      /* CE0 */
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&can0_int_pins &can0_rst_pins>;
+			spi-max-frequency = <2000000>;
+                        interrupt-parent = <&gpio>;
+                        interrupts = <26 0x8>; /* IRQ_TYPE_LEVEL_LOW */
+                        clocks = <&can0_osc>;
+		    };
+		};
+	};
+
+        __overrides__ {
+            oscillator = <&can0_osc>,"clock-frequency:0";
+            speed = <&can0>,"spi-max-frequency:0";
+        };
+};
