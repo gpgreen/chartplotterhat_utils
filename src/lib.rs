@@ -3,20 +3,17 @@ use embedded_hal::{
     digital::v2::{InputPin, OutputPin},
 };
 use std::{thread, time};
+use thiserror::Error;
 
-/// driver error
-#[derive(Debug, PartialEq)]
-pub enum PowerError<PE> {
-    /// Pin Error
-    PinError(PE),
-}
-
-/// driver error
-#[derive(Debug, PartialEq)]
+/// SPI driver error
+#[derive(Error, Debug, PartialEq)]
 pub enum SpiError<SPIE, PE> {
-    SpiError(SPIE),
+    /// SPI error
+    #[error("transparent")]
+    Spi(#[from] SPIE),
     /// Pin Error
-    PinError(PE),
+    #[error("transparent")]
+    Pin(PE),
 }
 
 /// device to work with ChartPlotterHat power functions
@@ -39,19 +36,21 @@ where
     }
 
     /// set the `running_pin` to high, indicating RaspberryPi is running
-    pub fn set_running(&mut self) -> Result<(), PowerError<PE>> {
-        self.running_pin.set_high().map_err(PowerError::PinError)?;
+    pub fn set_running(&mut self) -> Result<(), PE> {
+        self.running_pin.set_high()?;
         Ok(())
     }
 
-    /// check the `shutdown_pin`, to see if Chart Plotter Hat is signaling a shutdown
-    pub fn shutdown_signal(&self) -> Result<bool, PowerError<PE>> {
+    /// check the `shutdown_pin`, to see if the hat is signaling a shutdown
+    /// if signaled, loop the required amount of time to verify that it stays signaled
+    /// return the result, true if signaled correctly, false if no
+    pub fn shutdown_signal(&self) -> Result<bool, PE> {
         match self.shutdown_pin.is_high() {
             Ok(on) => {
                 if on {
                     for _n in 0..6 {
                         thread::sleep(time::Duration::from_millis(100));
-                        if !self.shutdown_pin.is_high().map_err(PowerError::PinError)? {
+                        if !self.shutdown_pin.is_high()? {
                             return Ok(false);
                         }
                     }
@@ -60,7 +59,7 @@ where
                     Ok(false)
                 }
             }
-            Err(e) => Err(PowerError::PinError(e)),
+            Err(e) => Err(e),
         }
     }
 }
@@ -83,20 +82,18 @@ where
 
     /// method to send/retrieve data via SPI
     fn full_duplex(&mut self, addr: u8) -> Result<[u8; 2], SpiError<SPIE, PE>> {
-        self.cs.set_low().map_err(SpiError::PinError)?;
+        self.cs.set_low().map_err(SpiError::Pin)?;
         thread::sleep(time::Duration::from_micros(50));
         let mut tx_buf = [addr, 0x0, 0x0];
         for n in 0..3 {
-            self.spi
-                .transfer(&mut tx_buf[n..n + 1])
-                .map_err(SpiError::SpiError)?;
+            self.spi.transfer(&mut tx_buf[n..n + 1])?;
             match n {
                 0 => thread::sleep(time::Duration::from_micros(40)),
                 1 => thread::sleep(time::Duration::from_micros(20)),
                 _ => thread::sleep(time::Duration::from_micros(10)),
             }
         }
-        self.cs.set_high().map_err(SpiError::PinError)?;
+        self.cs.set_high().map_err(SpiError::Pin)?;
         Ok([tx_buf[1], tx_buf[2]])
     }
 

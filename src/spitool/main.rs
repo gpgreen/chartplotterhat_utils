@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use chartplotterhat_utils::ChartPlotterHatSpi;
 use clap::Parser;
 use embedded_hal::digital::v2::OutputPin;
@@ -7,6 +8,14 @@ use hal::{
     CdevPin, Spidev,
 };
 use linux_embedded_hal as hal;
+
+// constants for devices
+const GPIO_PIN_OWNER: &str = "spitool";
+const SPIDEVNM: &str = "/dev/spidev0.0";
+const GPIOCHIP: &str = "/dev/gpiochip0";
+
+// raspberry pi pin numbers used by this executable
+const CS_PIN_NUM: u32 = 8;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -19,27 +28,31 @@ struct Args {
     verbose: bool,
 }
 
-fn main() {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     // configure SPI
-    let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
+    let mut spi =
+        Spidev::open(SPIDEVNM).with_context(|| format!("Can't read device {}", SPIDEVNM))?;
     // set the SPI clk speed very slow, so spi slave can respond
     let options = SpidevOptions::new()
         .bits_per_word(8)
         .max_speed_hz(32_000)
         .mode(SpiModeFlags::SPI_MODE_0 | SpiModeFlags::SPI_NO_CS)
         .build();
-    spi.configure(&options).unwrap();
+    spi.configure(&options)?;
 
     // configure Digital I/O pin to be used as cs pin
-    let mut chip = Chip::new("/dev/gpiochip0").unwrap();
-    let cs_line = chip.get_line(8).unwrap();
+    let mut chip =
+        Chip::new(GPIOCHIP).with_context(|| format!("Can't read GPIO device: {}", GPIOCHIP))?;
+    let cs_line = chip
+        .get_line(CS_PIN_NUM)
+        .with_context(|| format!("Can't get GPIO line {}", CS_PIN_NUM))?;
     let cs_lh = cs_line
-        .request(LineRequestFlags::OUTPUT, 1, "spitool")
-        .unwrap();
-    let mut cs = CdevPin::new(cs_lh).unwrap();
-    cs.set_high().unwrap();
+        .request(LineRequestFlags::OUTPUT, 1, GPIO_PIN_OWNER)
+        .with_context(|| format!("Unable to create GPIO Line Handle {} as OUTPUT", CS_PIN_NUM))?;
+    let mut cs = CdevPin::new(cs_lh)?;
+    cs.set_high()?;
 
     // create the ChartPlotterhat device
     let mut cph = ChartPlotterHatSpi::new(spi, cs);
@@ -57,4 +70,5 @@ fn main() {
         }
         cph.toggle_eeprom().unwrap();
     }
+    Ok(())
 }
