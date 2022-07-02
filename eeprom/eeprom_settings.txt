@@ -71,11 +71,6 @@ back_power 1
 
 #         GPIO  FUNCTION  PULL
 #         ----  --------  ----
-# serial0 RX
-#setgpio  14    INPUT     DEFAULT
-# serial0 TX
-#setgpio  15    INPUT     DEFAULT
-
 # I2C-1 SDA
 setgpio  2     ALT0     DEFAULT
 # I2C-1 SCL
@@ -90,8 +85,10 @@ setgpio  9     ALT0     DEFAULT
 setgpio  10    ALT0     DEFAULT
 # SPI0 SCK, ALT0
 setgpio  11    ALT0     DEFAULT
-# CAN_RST
-setgpio  16    OUTPUT     UP
+# serial0 RX
+#setgpio  14    INPUT     DEFAULT
+# serial0 TX
+#setgpio  15    INPUT     DEFAULT
 # CAN_CS, SPI1_CEO_N, ALT4
 setgpio  18    ALT4     DEFAULT
 # SPI1 SO, ALT4

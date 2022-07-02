@@ -79,12 +79,6 @@
                     brcm,pins = <26>; /* gpio26, hardware pin 37 */
                     brcm,function = <0>; /* input */
                 };
-                can0_rst_pins: can0_rst_pins {
-                    brcm,pins = <16>; /* gpio 16, hardware pin 36 */
-                    brcm,pull = <1>; /* pull up */
-                    brcm,function = <1>; /* output */
-                    output-high;
-                };
             };
         };
 
@@ -112,7 +106,7 @@
 		        compatible = "microchip,mcp2515";
 			reg = <0>;      /* CE0 */
                         pinctrl-names = "default";
-                        pinctrl-0 = <&can0_int_pins &can0_rst_pins>;
+                        pinctrl-0 = <&can0_int_pins>;
 			spi-max-frequency = <2000000>;
                         interrupt-parent = <&gpio>;
                         interrupts = <26 0x8>; /* IRQ_TYPE_LEVEL_LOW */
