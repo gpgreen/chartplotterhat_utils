@@ -13,7 +13,7 @@ pub enum SpiError<SPIE, PE> {
     /// Pin Error
     #[error("transparent")]
     Pin(PE),
-    #[error("ADC Channel is not operating")]
+    #[error("ADC Channel is out of range")]
     BadChannel,
 }
 
@@ -141,14 +141,21 @@ where
         Ok(())
     }
 
-    /// get which channels are operating
-    pub fn get_channels(&mut self) -> Result<u8, SpiError<SPIE, PE>> {
+    /// check with hardware to see if a channels is operating
+    pub fn is_channel_op(&mut self, ch: u8) -> Result<bool, SpiError<SPIE, PE>> {
+        if ch > 4 {
+            return Err(SpiError::BadChannel);
+        }
         let channels = self.full_duplex(0x02, 0)?;
-        Ok(channels[0])
+        if channels[0] & (1 << ch) == (1 << ch) {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 
-    /// get a reading from operating channel
-    pub fn get_reading(&mut self, ch: u8) -> Result<u16, SpiError<SPIE, PE>> {
+    /// read current adc channel value
+    pub fn read(&mut self, ch: u8) -> Result<u16, SpiError<SPIE, PE>> {
         if ch > 4 {
             return Err(SpiError::BadChannel);
         }
