@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use chartplotterhat_utils::ChartPlotterHatPower;
 use hal::{
     gpio_cdev::{Chip, LineRequestFlags},
-    CdevPin,
+    CdevPin, Delay,
 };
 use linux_embedded_hal as hal;
 use std::{env, process::Command, thread, time};
@@ -82,7 +82,7 @@ fn main() -> Result<()> {
     let shutdown = CdevPin::new(handle).context("Unable to create CdevPin from Line Handle")?;
 
     // create the ChartPlotterHatPower device
-    let mut cph = ChartPlotterHatPower::new(shutdown, mcu_running);
+    let mut cph = ChartPlotterHatPower::new(shutdown, mcu_running, Delay);
 
     // set the pin to show we are running
     cph.set_running()?;

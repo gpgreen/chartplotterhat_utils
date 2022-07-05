@@ -86,9 +86,9 @@ setgpio  10    ALT0     DEFAULT
 # SPI0 SCK, ALT0
 setgpio  11    ALT0     DEFAULT
 # serial0 RX
-#setgpio  14    INPUT     DEFAULT
+setgpio  14    ALT5     DEFAULT
 # serial0 TX
-#setgpio  15    INPUT     DEFAULT
+setgpio  15    ALT5     DEFAULT
 # CAN_CS, SPI1_CEO_N, ALT4
 setgpio  18    ALT4     DEFAULT
 # SPI1 SO, ALT4

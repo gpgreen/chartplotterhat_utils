@@ -3,10 +3,26 @@
 
 
 / {
-	compatible = "brcm,bcm2835", "brcm,bcm2708", "brcm,bcm2709";
+	compatible = "brcm,bcm2708", "brcm,bcm2709", "brcm,bcm2711", "brcm,bcm2835";
+
+        /* enable uart1 on default pins, 14,15 */
+        fragment@0 {
+            target = <&uart1>;
+            __overlay__ {
+                status = "okay";
+            };
+        };
+
+        /* enable i2c1 on default pins, 2,3 */
+        fragment@1 {
+            target = <&i2c1>;
+            __overlay__ {
+                status = "okay";
+            };
+        };
 
         /* the pins of spi0 */
-        fragment@0 {
+        fragment@2 {
             target = <&gpio>;
             __overlay__ {
                 spi0_pins: spi0_pins {
@@ -21,7 +37,7 @@
         };
 
         /* spi 0 using only pin 7 as csN, we need pin 8 as general gpio */
-        fragment@1 {
+        fragment@3 {
             target = <&spi0>;
             __overlay__ {
                 /* needed to avoid dtc warning */
@@ -35,7 +51,7 @@
         };
 
         /* disable spidev1 */
-        fragment@2 {
+        fragment@4 {
             target = <&spidev1>;
             __overlay__ {
                 status = "disabled";
@@ -43,7 +59,7 @@
         };
 
         /* the pins of spi1 */
-        fragment@3 {
+        fragment@5 {
             target = <&gpio>;
             __overlay__ {
                 spi1_pins: spi1_pins {
@@ -58,7 +74,7 @@
         };
 
         /* spi1 config */
-        fragment@4 {
+        fragment@6 {
             target = <&spi1>;
             __overlay__ {
                 /* needed to avoid dtc warning */
@@ -72,7 +88,7 @@
         };
 
         /* the interrupt pin of the can-controller */
-        fragment@5 {
+        fragment@7 {
             target = <&gpio>;
             __overlay__ {
                 can0_int_pins: can0_int_pins {
@@ -83,7 +99,7 @@
         };
 
         /* the clock/oscillator of the can-controller */
-        fragment@6 {
+        fragment@8 {
             target-path = "/clocks";
                 __overlay__ {
                     /* external oscillator of mcp2515 on spi1.0 */
@@ -96,7 +112,7 @@
         };
 
         /* the spi config of the can-controller */
-	fragment@7 {
+	fragment@9 {
 		target = <&spi1>;
 		__overlay__ {
 		    /* needed to avoid dtc warning */

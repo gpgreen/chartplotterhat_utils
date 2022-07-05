@@ -11,9 +11,11 @@ Intended for use with Raspberry PI boat computer project.
 The binary `shutdown_monitor` is used to control and monitor the GPIO
 pins on the Raspberry Pi to work in concert with the firmware. This
 binary is copied to /usr/bin. The systemd service file
-`shutdown_monitor.service` and is copied to /lib/systemd/service.
+`shutdown_monitor.service` and this is copied to /lib/systemd/service.
 
 The process requires 2 environment variables to be set, which are in the systemd service file.
+- OPENCPN_PKILL_DELAY this is the delay in seconds to wait after the opencpn pkill command has been executed
+- OPENCPN_USER this is which system user is executing the pkill command
 
 Enabling and starting the service using systemd
 ```
@@ -55,7 +57,7 @@ Hat](https://github.com/raspberrypi/hats/tree/master/eepromutils). Use
 the `eeprom/settings.txt` file and include the overlay name when
 creating the eeprom data file.
 ```
-eepmake eeprom_settings.txt eeprom.eep chart-plotter-hat
+eepmake eeprom_settings.txt eeprom.eep chart-plotter-hat.txt
 ```
 
 License

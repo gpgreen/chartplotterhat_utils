@@ -5,7 +5,7 @@ use embedded_hal::digital::v2::OutputPin;
 use hal::{
     gpio_cdev::{Chip, LineRequestFlags},
     spidev::{SpiModeFlags, SpidevOptions},
-    CdevPin, Spidev,
+    CdevPin, Delay, Spidev,
 };
 use linux_embedded_hal as hal;
 
@@ -55,7 +55,7 @@ fn main() -> Result<()> {
     cs.set_high()?;
 
     // create the ChartPlotterhat device
-    let mut cph = ChartPlotterHatSpi::new(spi, cs);
+    let mut cph = ChartPlotterHatSpi::new(spi, cs, Delay);
     let version = cph.get_version().unwrap();
     println!(
         "Chart Plotter Hat\n version: {}.{}\n can_hardware: {:?}",
