@@ -23,9 +23,15 @@ struct Args {
     /// toggle the eeprom
     #[clap(short, long, action)]
     eeprom: bool,
-    /// verbose
-    #[clap(short, long, action)]
-    verbose: bool,
+    /// set the adc channel to operational
+    #[clap(short, long, default_value_t = 0)]
+    set: u8,
+    /// is the adc channel operational
+    #[clap(short, long, default_value_t = 0)]
+    get: u8,
+    /// read the adc channel operational
+    #[clap(short, long, default_value_t = 0)]
+    read: u8,
 }
 
 fn main() -> Result<()> {
@@ -65,10 +71,26 @@ fn main() -> Result<()> {
     );
 
     if args.eeprom {
-        if args.verbose {
-            println!("Toggling the eeprom write line..");
-        }
+        println!("Toggling the eeprom write line..");
         cph.toggle_eeprom().unwrap();
+    }
+    if args.set != 0 {
+        println!("Setting adc channel {} on", args.set);
+        cph.set_channel(args.set).unwrap();
+    }
+    if args.get != 0 {
+        println!(
+            "Channel {} is operational {}",
+            args.get,
+            cph.is_channel_op(args.get).unwrap()
+        );
+    }
+    if args.read != 0 {
+        println!(
+            "Channel {} reading is {}",
+            args.read,
+            cph.read(args.read).unwrap()
+        );
     }
     Ok(())
 }
